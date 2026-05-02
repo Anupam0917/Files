@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nimbus — Live Weather</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ── NOTIFICATION TOAST ── -->
+<div id="toast" class="toast" aria-live="polite"></div>
+
+<!-- ── AUTH MODAL ── -->
+<div id="authModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <button class="modal-close" id="closeModal"><i class="fa fa-times"></i></button>
+
+    <!-- Login -->
+    <div id="loginPane" class="auth-pane active">
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-sub">Sign in to access your favourites</p>
+      <input type="email" id="loginEmail" class="auth-input" placeholder="Email" />
+      <input type="password" id="loginPassword" class="auth-input" placeholder="Password" />
+      <button class="auth-btn" id="loginBtn">Sign In</button>
+      <p class="auth-switch">No account? <span id="goSignup">Create one</span></p>
+    </div>
+
+    <!-- Signup -->
+    <div id="signupPane" class="auth-pane">
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-sub">Start saving your favourite cities</p>
+      <input type="text" id="signupName" class="auth-input" placeholder="Full Name" />
+      <input type="email" id="signupEmail" class="auth-input" placeholder="Email" />
+      <input type="password" id="signupPassword" class="auth-input" placeholder="Password" />
+      <button class="auth-btn" id="signupBtn">Sign Up</button>
+      <p class="auth-switch">Already registered? <span id="goLogin">Sign in</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+  <a class="brand" id="homeBtn"><span class="brand-dot">◆</span> Nimbus</a>
+
+  <div class="nav-center">
+    <div class="search-wrap">
+      <i class="fa fa-search search-icon"></i>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search city or country…" autocomplete="off" />
+      <div id="suggestions" class="suggestions-list hidden"></div>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <!-- Language -->
+    <select id="langSelect" class="pill-select" title="Language">
+      <option value="en">🇬🇧 EN</option>
+      <option value="hi">🇮🇳 HI</option>
+      <option value="fr">🇫🇷 FR</option>
+    </select>
+
+    <!-- Temp unit toggle -->
+    <button class="pill-btn" id="unitToggle" title="Toggle °C / °F">°C</button>
+
+    <!-- Theme toggle -->
+    <button class="pill-btn" id="themeToggle" title="Toggle theme">
+      <i class="fa fa-moon"></i>
+    </button>
+
+    <!-- Auth -->
+    <button class="pill-btn accent" id="authBtn">Sign In</button>
+    <button class="pill-btn danger hidden" id="logoutBtn">Logout</button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="main">
+
+  <!-- Hero / Current Weather Card -->
+  <section id="heroSection" class="hero-section">
+    <div class="hero-bg" id="heroBg"></div>
+
+    <div class="hero-content hidden" id="heroContent">
+      <div class="hero-top">
+        <div>
+          <h1 class="city-name" id="cityName">—</h1>
+          <p class="city-meta" id="cityMeta"></p>
+        </div>
+        <div class="hero-actions">
+          <button class="icon-btn" id="favBtn" title="Add to favourites"><i class="fa fa-star"></i></button>
+          <button class="icon-btn" id="locBtn" title="My location"><i class="fa fa-location-crosshairs"></i></button>
+        </div>
+      </div>
+
+      <div class="hero-body">
+        <div class="temp-block">
+          <span class="weather-icon" id="weatherIcon">🌤</span>
+          <span class="temp-value" id="tempValue">--</span>
+          <span class="temp-unit">°<span id="unitLabel">C</span></span>
+        </div>
+        <p class="weather-desc" id="weatherDesc">—</p>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-chip">
+          <i class="fa fa-droplet"></i>
+          <span id="humidity">--%</span>
+          <small>Humidity</small>
+        </div>
+        <div class="stat-chip">
+          <i class="fa fa-wind"></i>
+          <span id="windSpeed">-- km/h</span>
+          <small>Wind</small>
+        </div>
+        <div class="stat-chip">
+          <i class="fa fa-eye"></i>
+          <span id="visibility">-- km</span>
+          <small>Visibility</small>
+        </div>
+        <div class="stat-chip">
+          <i class="fa fa-gauge"></i>
+          <span id="pressure">-- hPa</span>
+          <small>Pressure</small>
+        </div>
+      </div>
+
+      <p class="datetime" id="datetime"></p>
+    </div>
+
+    <!-- Placeholder when nothing searched -->
+    <div class="hero-placeholder" id="heroPlaceholder">
+      <div class="placeholder-orb"></div>
+      <h2>Discover your weather</h2>
+      <p>Search any city or allow location access to begin</p>
+      <button class="pill-btn accent large" id="detectBtn"><i class="fa fa-location-crosshairs"></i> Detect My Location</button>
+    </div>
+  </section>
+
+  <!-- 5-Day Forecast -->
+  <section class="forecast-section hidden" id="forecastSection">
+    <h3 class="section-title">5-Day Forecast</h3>
+    <div class="forecast-grid" id="forecastGrid"></div>
+  </section>
+
+  <!-- Favourites -->
+  <section class="favs-section hidden" id="favsSection">
+    <h3 class="section-title">⭐ My Favourites</h3>
+    <div class="favs-grid" id="favsGrid"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span>Nimbus Weather &copy; 2026 &mdash; Powered by <a href="https://openweathermap.org" target="_blank">OpenWeatherMap</a></span>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
